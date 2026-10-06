@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>圣经故事情节大冒险</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#E9EEF6; --paper:#FFFFFF; --ink:#16233B; --muted:#56627A; --line:#C9D3E3;
+  --lapis:#23427A; --gold:#B8901F; --gold-soft:#F3E7C2; --crimson:#A8323A; --crimson-soft:#F6DADC;
+  --olive:#4E7340; --olive-soft:#DDEBD5;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky:#0F1A2E; --paper:#18253D; --ink:#E7ECF5; --muted:#A3AFC5; --line:#2E3F5E;
+    --lapis:#8FB0EA; --gold:#E2BE55; --gold-soft:#3A3218; --crimson:#E2737A; --crimson-soft:#3D1F24;
+    --olive:#9CC48A; --olive-soft:#21331C;
+  }
+}
+:root[data-theme="dark"]{
+  --sky:#0F1A2E; --paper:#18253D; --ink:#E7ECF5; --muted:#A3AFC5; --line:#2E3F5E;
+  --lapis:#8FB0EA; --gold:#E2BE55; --gold-soft:#3A3218; --crimson:#E2737A; --crimson-soft:#3D1F24;
+  --olive:#9CC48A; --olive-soft:#21331C;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--sky);color:var(--ink);
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:17px;line-height:1.7}
+h1,h2,h3{font-family:"Noto Serif SC","Songti SC","SimSun",serif;line-height:1.3;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:20px 18px 48px}
+/* story line banner */
+.banner{position:relative;margin-bottom:18px}
+.banner svg{display:block;width:100%;height:auto}
+.track{fill:none;stroke:var(--line);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.trail{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 1.2s ease}
+.banner-title{font-family:"Noto Serif SC",serif;font-weight:900;font-size:clamp(26px,5.5vw,42px);letter-spacing:.04em}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:6px 0 18px}
+.scores{display:flex;gap:10px;flex-wrap:wrap}
+.chip{padding:4px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:15px}
+.chip.on{border-color:var(--gold);background:var(--gold-soft);font-weight:700}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 20px}
+.lede{color:var(--muted);margin:.4em 0 1em}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:none;border-radius:10px;padding:12px 22px;background:var(--lapis);color:#fff;font-weight:700}
+:root[data-theme="dark"] .btn{color:#0F1A2E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#0F1A2E}}
+.btn.ghost{background:transparent;color:var(--lapis);border:1.5px solid var(--lapis)}
+.btn:focus-visible,.card:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.levels{list-style:none;padding:0;margin:14px 0 0;counter-reset:lv}
+.levels li{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)}
+.levels li::before{counter-increment:lv;content:counter(lv);font-family:"Noto Serif SC",serif;font-weight:900;color:var(--gold);font-size:22px;min-width:1.2em}
+.levels b{font-family:"Noto Serif SC",serif}
+.levels span{color:var(--muted);font-size:15px}
+/* plot board */
+.plot svg{width:100%;height:auto;display:block}
+.dot{fill:var(--paper);stroke:var(--line);stroke-width:3}
+.dot.next{stroke:var(--gold);stroke-width:4}
+.dot.done{fill:var(--gold);stroke:var(--gold)}
+.dotnum{font:700 15px "Noto Sans SC",sans-serif;fill:var(--muted);text-anchor:middle;dominant-baseline:central}
+.dotnum.done{fill:#fff}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 16px;margin:10px 0 4px;padding:0;list-style:none}
+.slots li{font-size:15px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.slots li.cur{color:var(--gold);font-weight:700}
+.slots em{font-style:normal;color:var(--olive);font-weight:700}
+.pool{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.card{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 16px;font-weight:500}
+.card:hover{border-color:var(--lapis)}
+.card.used{visibility:hidden}
+.card.bad{animation:shake .4s;border-color:var(--crimson);background:var(--crimson-soft)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ask{font-family:"Noto Serif SC",serif;font-size:20px;font-weight:700;margin:10px 0 0}
+.stmt{font-family:"Noto Serif SC",serif;font-size:21px;font-weight:700;margin:6px 0 18px;line-height:1.6}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:12px 16px}
+.opt:hover:not(:disabled){border-color:var(--lapis)}
+.opt.right{border-color:var(--olive);background:var(--olive-soft)}
+.opt.wrong{border-color:var(--crimson);background:var(--crimson-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fb{margin-top:16px;padding:14px 16px;border-radius:10px;border-left:5px solid var(--olive);background:var(--olive-soft)}
+.fb.no{border-left-color:var(--crimson);background:var(--crimson-soft)}
+.fb p{margin:0}
+.count{color:var(--muted);font-size:15px}
+.big{font-family:"Noto Serif SC",serif;font-size:56px;font-weight:900;color:var(--gold);line-height:1.1}
+.theme{background:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--muted)}
+@media (max-width:520px){.two{grid-template-columns:1fr}.panel{padding:18px 14px}.stmt{font-size:19px}}
+@media (prefers-reduced-motion: reduce){.trail{transition:none}.card.bad{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="banner">
+    <svg viewBox="0 0 600 120" aria-hidden="true">
+      <path class="track" d="M20 30 H160 L230 104 L300 104 L400 30 H580"/>
+      <path class="trail" id="trail" pathLength="100" d="M20 30 H160 L230 104 L300 104 L400 30 H580"/>
+      <line x1="388" y1="22" x2="388" y2="66" stroke="var(--crimson)" stroke-width="5"/>
+      <line x1="374" y1="34" x2="402" y2="34" stroke="var(--crimson)" stroke-width="5"/>
+    </svg>
+    <div class="banner-title">圣经故事情节大冒险</div>
+  </header>
+  <div class="bar">
+    <div class="scores" id="scores"></div>
+    <button class="theme" id="themeBtn" type="button">切换深浅色</button>
+  </div>
+  <main id="app" class="panel" aria-live="polite"></main>
+</div>
+
+<script>
+(function(){
+  var app=document.getElementById('app');
+  var S={mode:'solo',score:0,teams:[0,0],active:0,done:0,total:0,right:0};
+  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+  /* ---------- data ---------- */
+  var PLOT=[
+    {el:'主角（英雄）',c:'神'},
+    {el:'背景',c:'人要代表神统治'},
+    {el:'对头',c:'蛇（撒但）'},
+    {el:'冲突',c:'撒但统治人'},
+    {el:'哲理',c:'一位新统治者与一个新地'},
+    {el:'上升行动',c:'神设立统治者，撒但攻击他们'},
+    {el:'高潮',c:'十字架'},
+    {el:'解决',c:'基督第二次再来'},
+    {el:'结局',c:'永远的国度'}
+  ];
+  var PLOTXY=[[60,70],[140,70],[200,130],[232,205],[285,245],[340,170],[395,100],[450,70],[540,70]];
+  var READ=[
+    {s:'把歌利亚当作你心中的嫉妒巨人，靠信心把它打倒。',a:0,e:'这把真实的战争改成了个人性格问题，靠的是解释者的想象，不是作者本意。'},
+    {s:'大卫胜过歌利亚，是神在装备他作王，为那终极的君王铺路。',a:1,e:'放回故事线中：大卫正被训练作神的王，最终指向启示录19章得胜的君王。'},
+    {s:'该隐与亚伯，是一个关于手足竞争心理的故事。',a:0,e:'作者正是用这例子批评脱离前后文的读法，它需要读者加入自己的文化感知。'},
+    {s:'要明白他玛为何“比犹大更有义”，必须回到创世记2:24与3:15。',a:1,e:'创38章单独读会令人困惑；所需信息在故事更早的“哲理”中。'},
+    {s:'挪亚方舟教导我们：在人生风暴中要为自己造好一艘“方舟”。',a:0,e:'这是把事件变成独立寓言。在整体情节中，挪亚是后裔线上的一环，预表那更大的拯救者。'},
+    {s:'每个故事出现、贡献它的一份，然后离场，为下一步铺路。',a:1,e:'这正是作者对戏剧性情节的描述：事件来来去去，各自在整体中扮演角色。'},
+    {s:'他玛的故事单独来看，就足以作为教导小女儿的道德榜样。',a:0,e:'作者指出，单独读这故事反而很难讲给女儿听，必须借助整体情节。'},
+    {s:'创世记3:15所应许的后裔，一路追溯到耶稣，证明圣经是一个情节。',a:1,e:'后裔穿越一个又一个失败的人，直到完全的人耶稣，这正是情节的推进。'}
+  ];
+  var SEED=['亚当','塞特','挪亚','亚伯拉罕','以撒','雅各','犹大','大卫','耶稣'];
+  var DECOY={'该隐':'该隐杀了亚伯，代表蛇的后裔，不在应许的后裔线上。','以扫':'以扫是以撒的儿子，但应许传给了雅各。','扫罗':'扫罗是以色列第一位王，但应许的宝座之约是赐给大卫的。'};
+  var WHO=[
+    {n:'神',a:0,e:'祂是英雄，从不改变，始终持守立子为王的旨意。'},
+    {n:'史古基（《圣诞颂歌》）',a:1,e:'他的哲理从错转对，作者把他当作“会失败的人”型主角的例子。'},
+    {n:'灰姑娘',a:0,e:'她起初的哲理（在逼迫中尽忠尽责）没有改变，最终赢得胜利。'},
+    {n:'亚当',a:1,e:'他被造来代表神却失败了，把受造界交给了撒但。'},
+    {n:'挪亚',a:1,e:'他是后裔线上的一环，却也像亚当一样失败（醉酒赤身）。'},
+    {n:'耶稣',a:0,e:'祂是神成功的形象，那完全顺服、最终统治的人。'}
+  ];
+  var QUIZ=[
+    {q:'作者认为，故事比清单或教条更能揭示什么？',o:['品格','年代','地理','教会历史'],a:0,e:'导论：故事揭示品格，而且是其他沟通工具无法企及的。'},
+    {q:'圣经故事的主角（英雄）是谁？',o:['亚当','大卫','神','读者自己'],a:2,e:'神是主要角色、主角、英雄。'},
+    {q:'圣经情节中的冲突从哪里开始？',o:['创世记1章','创世记3章','创世记12章','出埃及记20章'],a:1,e:'对头在创世记3:1-6进入，使神的代表人失败。'},
+    {q:'神克服冲突的“哲理”首先宣告于哪节经文？',o:['创世记1:1','约翰福音3:16','创世记3:15','启示录20:10'],a:2,e:'创世记3:15应许一位新亚当，毁灭蛇与旧创造。'},
+    {q:'作者的情节图中，圣经故事的高潮是什么？',o:['出埃及','十字架','大卫登基','五旬节'],a:1,e:'高潮是十字架；解决是基督第二次再来。'},
+    {q:'“片段式情节”的特点是：',o:['每个故事各自独立带出寓意','所有部分为单一信息服务','只记录历史不带信息','只有一位主角'],a:0,e:'选集式的故事因共同主题汇集，各自包含找出寓意所需的信息。'},
+    {q:'为什么作者说大卫杀歌利亚“不是请在家自行尝试”的榜样？',o:['歌利亚太高了','旧约已经过时','大卫是神所装备的王，读者不是那王','那只是寓言'],a:2,e:'大卫曾是那一位，如今耶稣是那一位；读者不是耶稣。'},
+    {q:'路加福音3章的家谱追溯的是什么？',o:['大卫王位的继承线','耶稣经拿单到大卫、再到亚当的血统','利未人的祭司线','以色列十二支派'],a:1,e:'马太福音1章是王位线；路加福音3章是肉身后裔线。'},
+    {q:'启示录21—22章与创世记1—2章用语相似，作者认为这是：',o:['交错配列','巧合','情节的结局：主角达成起初目标','另一个创造故事'],a:2,e:'结局像背景，是因为主角在整个情节中成就了祂的目标。'},
+    {q:'富邻居生日派对的比喻要说明什么？',o:['人人都能进国度','靠好行为得进国度','唯有爱神儿子的人得进祂的国度','派对比国度重要'],a:2,e:'约翰福音3:35-36：信子的人有永生。这回应了普救论与包容论。'}
+  ];
+  S.total=PLOT.length+READ.length+SEED.length+WHO.length+QUIZ.length;
+
+  /* ---------- helpers ---------- */
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function renderScores(){
+    var el=document.getElementById('scores');
+    if(S.mode==='solo'){el.innerHTML='<span class="chip on">得分 '+S.score+'</span>';return}
+    el.innerHTML=['甲队','乙队'].map(function(n,i){return '<span class="chip'+(S.active===i?' on':'')+'">'+n+' '+S.teams[i]+(S.active===i?'（作答中）':'')+'</span>'}).join('');
+  }
+  function award(ok){
+    if(ok)S.right++;
+    if(S.mode==='solo'){if(ok)S.score+=10}
+    else{if(ok)S.teams[S.active]+=10;S.active^=1}
+    renderScores();
+  }
+  function setTrail(){document.getElementById('trail').style.strokeDashoffset=100-S.done*20}
+  function head(n,title,lede){return '<p class="count">第 '+n+' 关，共 5 关</p><h2>'+title+'</h2><p class="lede">'+lede+'</p>'}
+  function nextBtn(label,fn){var b=document.createElement('button');b.className='btn';b.type='button';b.textContent=label;b.onclick=fn;return b}
+  function finishLevel(next){S.done++;setTrail();var r=document.createElement('div');r.className='row';r.appendChild(nextBtn(next?'进入下一关':'查看结果',next||finalScreen));app.appendChild(r);r.querySelector('button').focus()}
+
+  /* ---------- home ---------- */
+  function home(){
+    S.score=0;S.teams=[0,0];S.active=0;S.done=0;S.right=0;setTrail();renderScores();
+    var best=store('bs-best');
+    app.innerHTML='<h2>一条线，读懂整本圣经</h2>'+
+      '<p class="lede">上面那条金线就是圣经的情节：从创造的平静，跌入堕落，再一路上升到十字架与永远的国度。每过一关，金线就向前走一段。</p>'+
+      '<ol class="levels">'+
+      '<li><div><b>情节拼图</b><br><span>把九个情节要素按次序放上故事线</span></div></li>'+
+      '<li><div><b>两种读法</b><br><span>分辨片段式误读与戏剧性读法</span></div></li>'+
+      '<li><div><b>后裔接力</b><br><span>从亚当传到耶稣，小心冒牌者</span></div></li>'+
+      '<li><div><b>英雄还是会失败的人</b><br><span>为角色分类</span></div></li>'+
+      '<li><div><b>终极问答</b><br><span>十道综合题</span></div></li></ol>'+
+      (best?'<p class="count">本机最佳成绩：'+esc(best)+' 分</p>':'')+
+      '<div class="row"><button class="btn" id="solo" type="button">个人练习</button><button class="btn ghost" id="duo" type="button">两队对抗（课堂投影）</button></div>'+
+      '<p class="count" style="margin-top:10px">两队对抗时，每答一题就换另一队作答，答对得 10 分。</p>';
+    document.getElementById('solo').onclick=function(){S.mode='solo';renderScores();level1()};
+    document.getElementById('duo').onclick=function(){S.mode='duo';renderScores();level1()};
+  }
+
+  /* ---------- level 1: plot puzzle ---------- */
+  function level1(){
+    var step=0;
+    app.innerHTML=head(1,'情节拼图','金色圆点是下一个要填的位置。从下方卡片中选出它在圣经故事里对应的内容。')+
+      '<div class="plot"><svg viewBox="0 0 600 290" role="img" aria-label="圣经情节曲线"><path class="track" d="M40 70 H170 L250 245 L300 245 L420 70 H570"/>'+
+      PLOTXY.map(function(p,i){return '<circle class="dot" id="d'+i+'" cx="'+p[0]+'" cy="'+p[1]+'" r="16"/><text class="dotnum" id="t'+i+'" x="'+p[0]+'" y="'+p[1]+'">'+(i+1)+'</text>'}).join('')+
+      '</svg></div><ul class="slots" id="slots"></ul><p class="ask" id="ask"></p><div class="pool" id="pool"></div><div id="fb"></div>';
+    var pool=document.getElementById('pool');
+    shuffle(PLOT.map(function(p,i){return i})).forEach(function(i){
+      var b=document.createElement('button');b.type='button';b.className='card';b.textContent=PLOT[i].c;b.dataset.i=i;
+      b.onclick=function(){
+        if(step>=PLOT.length)return;
+        var ok=+b.dataset.i===step;award(ok);
+        if(ok){b.classList.add('used');step++;draw();if(step===PLOT.length){document.getElementById('fb').innerHTML='<div class="fb"><p>故事线完成：从“人要统治”的背景，经冲突与上升行动，到十字架的高潮，再到永远的国度。</p></div>';finishLevel(level2)}}
+        else{b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');document.getElementById('fb').innerHTML='<div class="fb no"><p>“'+esc(PLOT[+b.dataset.i].c)+'”属于“'+PLOT[+b.dataset.i].el+'”，不是这一步。再试一次。</p></div>'}
+      };pool.appendChild(b);
+    });
+    function draw(){
+      document.getElementById('slots').innerHTML=PLOT.map(function(p,i){return '<li class="'+(i===step?'cur':'')+'">'+(i+1)+'　'+p.el+'：'+(i<step?'<em>'+esc(p.c)+'</em>':'＿＿')+'</li>'}).join('');
+      PLOT.forEach(function(p,i){var d=document.getElementById('d'+i),t=document.getElementById('t'+i);d.setAttribute('class','dot'+(i<step?' done':i===step?' next':''));t.setAttribute('class','dotnum'+(i<step?' done':''))});
+      document.getElementById('ask').textContent=step<PLOT.length?('第 '+(step+1)+' 步「'+PLOT[step].el+'」是什么？'):'';
+    }
+    draw();
+  }
+
+  /* ---------- level 2: two readings ---------- */
+  function binaryLevel(n,title,lede,items,labels,key,after,next){
+    var i=0;var list=shuffle(items);
+    function show(){
+      var it=list[i];
+      app.innerHTML=head(n,title,lede)+'<p class="count">第 '+(i+1)+' / '+list.length+' 题</p><p class="stmt">'+esc(it[key])+'</p>'+
+        '<div class="two">'+labels.map(function(l,k){return '<button class="opt" type="button" data-k="'+k+'">'+l+'</button>'}).join('')+'</div><div id="fb"></div>';
+      app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){
+        var k=+b.dataset.k,ok=k===it.a;award(ok);
+        app.querySelectorAll('.opt').forEach(function(x){x.disabled=true;if(+x.dataset.k===it.a)x.classList.add('right')});
+        if(!ok)b.classList.add('wrong');
+        document.getElementById('fb').innerHTML='<div class="fb'+(ok?'':' no')+'"><p><b>'+(ok?'答对了。':'答案是「'+labels[it.a]+'」。')+'</b>'+esc(it.e)+'</p></div>';
+        i++;var r=document.createElement('div');r.className='row';
+        if(i<list.length){r.appendChild(nextBtn('下一题',show));app.appendChild(r);r.querySelector('button').focus()}
+        else{if(after)app.insertAdjacentHTML('beforeend','<div class="fb" style="border-left-color:var(--gold);background:var(--gold-soft)"><p>'+after+'</p></div>');finishLevel(next)}
+      }});
+    }
+    show();
+  }
+  function level2(){binaryLevel(2,'两种读法','这种讲法是把故事当成独立寓言（片段式误读），还是把它放回整体故事线（戏剧性读法）？',READ,['片段式误读','戏剧性读法'],'s','重点：个别故事离开整体情节，信息就不足，解释者只好把自己的神学塞进去。',level3)}
+
+  /* ---------- level 3: seed relay ---------- */
+  function level3(){
+    var step=0;
+    app.innerHTML=head(3,'后裔接力','创世记3:15应许女人的后裔要来。按次序点出这条后裔线，队伍里混进了三个冒牌者。')+
+      '<ul class="slots" id="chain"></ul><div class="pool" id="pool"></div><div id="fb"></div>';
+    var pool=document.getElementById('pool');
+    shuffle(SEED.concat(Object.keys(DECOY))).forEach(function(n){
+      var b=document.createElement('button');b.type='button';b.className='card';b.textContent=n;
+      b.onclick=function(){
+        if(step>=SEED.length)return;
+        var ok=n===SEED[step];award(ok);var fb=document.getElementById('fb');
+        if(ok){b.classList.add('used');step++;draw();fb.innerHTML='';
+          if(step===SEED.length){fb.innerHTML='<div class="fb"><p>后裔穿越一个又一个失败的人，最终到达完全的人耶稣（马太福音1章；路加福音3章）。这条线证明圣经是一个渐进的情节。</p></div>';finishLevel(level4)}}
+        else{b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad');
+          fb.innerHTML='<div class="fb no"><p>'+(DECOY[n]?esc(DECOY[n]):'“'+esc(n)+'”在后裔线上，但还没轮到他。')+'</p></div>'}
+      };pool.appendChild(b);
+    });
+    function draw(){document.getElementById('chain').innerHTML=SEED.map(function(s,i){return '<li class="'+(i===step?'cur':'')+'">'+(i+1)+'　'+(i<step?'<em>'+s+'</em>':'＿＿')+'</li>'}).join('')}
+    draw();
+  }
+
+  /* ---------- level 4 ---------- */
+  function level4(){binaryLevel(4,'英雄还是会失败的人','英雄从不改变，凭始终如一的正确得胜；会失败的人的哲理会从错转对，或在失败中显出需要。',WHO,['英雄','会失败的人'],'n','圣经中，英雄神穿越祂形象一再的失败，最终在祂成功的形象耶稣身上成就旨意。',level5)}
+
+  /* ---------- level 5: quiz ---------- */
+  function level5(){
+    var i=0;
+    function show(){
+      var it=QUIZ[i];
+      app.innerHTML=head(5,'终极问答','十道综合题，检验你是否掌握了整课。')+'<p class="count">第 '+(i+1)+' / '+QUIZ.length+' 题</p><p class="stmt">'+esc(it.q)+'</p>'+
+        '<div class="opts">'+it.o.map(function(o,k){return '<button class="opt" type="button" data-k="'+k+'">'+'ABCD'[k]+'．'+esc(o)+'</button>'}).join('')+'</div><div id="fb"></div>';
+      app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){
+        var k=+b.dataset.k,ok=k===it.a;award(ok);
+        app.querySelectorAll('.opt').forEach(function(x){x.disabled=true;if(+x.dataset.k===it.a)x.classList.add('right')});
+        if(!ok)b.classList.add('wrong');
+        document.getElementById('fb').innerHTML='<div class="fb'+(ok?'':' no')+'"><p><b>'+(ok?'答对了。':'正确答案是 '+'ABCD'[it.a]+'。')+'</b>'+esc(it.e)+'</p></div>';
+        i++;var r=document.createElement('div');r.className='row';
+        if(i<QUIZ.length){r.appendChild(nextBtn('下一题',show));app.appendChild(r);r.querySelector('button').focus()}
+        else finishLevel(null);
+      }});
+    }
+    show();
+  }
+
+  /* ---------- final ---------- */
+  function finalScreen(){
+    var pct=Math.round(S.right/ (S.right+0||1)*100);
+    var html='<h2>故事线已走完</h2>';
+    if(S.mode==='solo'){
+      var best=+(store('bs-best')||0);if(S.score>best){store('bs-best',String(S.score));best=S.score}
+      html+='<p class="big">'+S.score+' 分</p><p class="lede">首次就选对的步骤：'+S.right+' / '+S.total+'。本机最佳：'+best+' 分。</p>';
+    }else{
+      var w=S.teams[0]===S.teams[1]?'两队平手':(S.teams[0]>S.teams[1]?'甲队获胜':'乙队获胜');
+      html+='<p class="big">'+w+'</p><p class="lede">甲队 '+S.teams[0]+' 分，乙队 '+S.teams[1]+' 分。</p>';
+    }
+    html+='<div class="fb" style="border-left-color:var(--gold);background:var(--gold-soft)"><p>“父爱子，已将万有交在祂手里。信子的人有永生。”（约翰福音3:35-36）圣经从头到尾只有一个旨意：立祂的儿子坐在宝座上。</p></div>'+
+      '<div class="row"><button class="btn" id="again" type="button">再玩一次</button></div>';
+    app.innerHTML=html;document.getElementById('again').onclick=home;
+  }
+
+  /* ---------- theme ---------- */
+  document.getElementById('themeBtn').onclick=function(){
+    var r=document.documentElement,cur=r.getAttribute('data-theme');
+    var dark=cur?cur==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+    r.setAttribute('data-theme',dark?'light':'dark');
+  };
+  home();
+})();
+</script>
+</body>
+</html>
